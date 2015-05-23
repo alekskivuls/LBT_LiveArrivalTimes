@@ -1,16 +1,15 @@
 {
     "appKeys": {},
     "capabilities": [
-        ""
+        "location"
     ],
-    "companyName": "akivuls@yahoo.com",
+    "companyName": "Aleks Kivuls",
     "longName": "LBT_LiveArrivalTimes",
     "projectType": "pebblejs",
     "resources": {
         "media": [
             {
                 "file": "images/menu_icon.png",
-                "menuIcon": true,
                 "name": "IMAGE_MENU_ICON",
                 "type": "png"
             },
@@ -28,6 +27,12 @@
                 "file": "fonts/UbuntuMono-Regular.ttf",
                 "name": "MONO_FONT_14",
                 "type": "font"
+            },
+            {
+                "file": "images/long beach transit.png",
+                "menuIcon": true,
+                "name": "IMAGES_LONG_BEACH_TRANSIT_PNG",
+                "type": "png"
             }
         ]
     },

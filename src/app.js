@@ -1,60 +1,76 @@
-/**
- * Welcome to Pebble.js!
- *
- * This is where you write your app.
- */
-
 var UI = require('ui');
+var ajax = require('ajax');
 var Vector2 = require('vector2');
 
-var main = new UI.Card({
-  title: 'Pebble.js',
-  icon: 'images/menu_icon.png',
-  subtitle: 'Hello World!',
-  body: 'Press any button.'
+var parseFeed = function(data, quantity) {
+  var items = [];
+  for(var i = 0; i < quantity; i++) {
+    // Always upper case the description string
+    var title = data.list[i].weather[0].main;
+    title = title.charAt(0).toUpperCase() + title.substring(1);
+
+    // Get date/time substring
+    var time = data.list[i].dt_txt;
+    time = time.substring(time.indexOf('-') + 1, time.indexOf(':') + 3);
+
+    // Add to menu items array
+    items.push({
+      title:title,
+      subtitle:time
+    });
+  }
+
+  // Finally return whole array
+  return items;
+};
+
+// Show splash screen while waiting for data
+var splashWindow = new UI.Window();
+
+// Text element to inform user
+var text = new UI.Text({
+  position: new Vector2(0, 0),
+  size: new Vector2(144, 168),
+  text:'Downloading weather data...',
+  font:'GOTHIC_28_BOLD',
+  color:'black',
+  textOverflow:'wrap',
+  textAlign:'center',
+	backgroundColor:'white'
 });
 
-main.show();
+// Add to splashWindow and show
+splashWindow.add(text);
+splashWindow.show();
 
-main.on('click', 'up', function(e) {
-  var menu = new UI.Menu({
-    sections: [{
-      items: [{
-        title: 'Pebble.js',
-        icon: 'images/menu_icon.png',
-        subtitle: 'Can do Menus'
-      }, {
-        title: 'Second Item',
-        subtitle: 'Subtitle Text'
+// Make request to openweathermap.org
+ajax(
+  {
+    url:'http://api.openweathermap.org/data/2.5/forecast?q=London',
+    type:'json'
+  },
+  function(data) {
+    // Create an array of Menu items
+    var menuItems = parseFeed(data, 10);
+
+    // Construct Menu to show to user
+    var resultsMenu = new UI.Menu({
+      sections: [{
+        title: 'Current Forecast',
+        items: menuItems
       }]
-    }]
-  });
-  menu.on('select', function(e) {
-    console.log('Selected item #' + e.itemIndex + ' of section #' + e.sectionIndex);
-    console.log('The item is titled "' + e.item.title + '"');
-  });
-  menu.show();
-});
+    });
 
-main.on('click', 'select', function(e) {
-  var wind = new UI.Window({
-    fullscreen: true,
-  });
-  var textfield = new UI.Text({
-    position: new Vector2(0, 65),
-    size: new Vector2(144, 30),
-    font: 'gothic-24-bold',
-    text: 'Text Anywhere!',
-    textAlign: 'center'
-  });
-  wind.add(textfield);
-  wind.show();
-});
+    // Add an action for SELECT
+    resultsMenu.on('select', function(e) {
+      console.log('Item number ' + e.item + ' was pressed!');
+    });
 
-main.on('click', 'down', function(e) {
-  var card = new UI.Card();
-  card.title('A Card');
-  card.subtitle('Is a Window');
-  card.body('The simplest window type in Pebble.js.');
-  card.show();
-});
+    // Show the Menu, hide the splash
+    resultsMenu.show();
+    splashWindow.hide();
+  },
+  function(error) {
+    console.log('Download failed: ' + error);
+  }
+);
