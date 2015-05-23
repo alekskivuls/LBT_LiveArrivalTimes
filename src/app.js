@@ -43,32 +43,25 @@ var text = new UI.Text({
 splashWindow.add(text);
 splashWindow.show();
 
+
+
+//var routeNum = 121;
+var routeID = 63;
+var directionID = 4;
+var stopID = 1348;
+var busData = {"routeID": routeID,"directionID":directionID,"stopID":stopID,"useArrivalTimes":true};
 // Make request to openweathermap.org
 ajax(
   {
-    url:'http://api.openweathermap.org/data/2.5/forecast?q=London',
-    type:'json'
+    url:'http://webwatch.lbtransit.com/tmwebwatch/Arrivals.aspx/getStopTimes',
+    method: 'post', 
+    type:'json',
+      data: busData,
+    crossDomain: true
   },
   function(data) {
-    // Create an array of Menu items
-    var menuItems = parseFeed(data, 10);
-
-    // Construct Menu to show to user
-    var resultsMenu = new UI.Menu({
-      sections: [{
-        title: 'Current Forecast',
-        items: menuItems
-      }]
-    });
-
-    // Add an action for SELECT
-    resultsMenu.on('select', function(e) {
-      console.log('Item number ' + e.item + ' was pressed!');
-    });
-
-    // Show the Menu, hide the splash
-    resultsMenu.show();
-    splashWindow.hide();
+    console.log('Success and Result is: ' + data);
+    console.log('Stringified is: ' + JSON.stringify(data));
   },
   function(error) {
     console.log('Download failed: ' + error);
