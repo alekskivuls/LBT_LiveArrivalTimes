@@ -9,8 +9,8 @@ var parseBusTimes = function(data) {
         schedTime = data.d.stops[0].crossings[i].schedTime;
         countdown = data.d.stops[0].crossings[i].countdown;
         items.push({
-            title: 'Scheduled time:' + schedTime,
-            subtitle: 'Countdown:' + countdown
+            title: schedTime,
+            subtitle: countdown
         });
     }
     return items;
@@ -23,7 +23,7 @@ var splashWindow = new UI.Window();
 var text = new UI.Text({
   position: new Vector2(0, 0),
   size: new Vector2(144, 168),
-  text:'Downloading weather data...',
+  text:'Downloading bus data...',
   font:'GOTHIC_28_BOLD',
   color:'black',
   textOverflow:'wrap',
