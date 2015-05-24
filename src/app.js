@@ -16,6 +16,22 @@ var parseBusTimes = function(data) {
     return items;
 };
 
+var parseRoutes = function(data) {
+    var items = [];
+    var number, name;// = data.d.stops[0].crossings[0].countdown;
+    for(var i = 0; i < data.d.length; i++) {
+        var fullName = data.d[i].name;
+        number = fullName.substring(0, fullName.indexOf('-')-1);
+        name = fullName.substring(fullName.indexOf('-')+1);
+        items.push({
+            title: number,
+            subtitle: name
+        });
+    }
+    return items;
+};
+
+
 // Show splash screen while waiting for data
 var splashWindow = new UI.Window();
 
@@ -71,4 +87,37 @@ splashWindow.hide();
 );
 };
 
-getBusTimes(0,0,0,0);
+
+var getRoutes = function() {
+// Make request to lbt
+var busData = {"routeID": 1,"directionID":1,"stopID":1,"useArrivalTimes":true};
+ajax(
+  {
+    url:'http://webwatch.lbtransit.com/tmwebwatch/Arrivals.aspx/getRoutes',
+    method: 'post', 
+    type:'json',
+    data: busData,
+    crossDomain: true
+  },
+  function(data) {
+    console.log('Stringified is: ' + JSON.stringify(data));
+      
+    var menuItems = parseRoutes(data);
+    var resultsMenu = new UI.Menu({
+    sections: [{
+        title: 'Routes',
+        items: menuItems
+    }]
+});
+
+resultsMenu.show();
+splashWindow.hide();
+  },
+  function(error) {
+    console.log('Download failed: ' + error);
+  }
+);
+};
+
+getRoutes();
+//getBusTimes(0,0,0,0);
