@@ -5,6 +5,7 @@ var Vector2 = require('vector2');
 var parseBusTimes = function(data) {
     var items = [];
     var countdown, schedTime;// = data.d.stops[0].crossings[0].countdown;
+    if(data.d.stops[0].crossings!==null)
     for(var i = 0; i < data.d.stops[0].crossings.length; i++) {
         schedTime = data.d.stops[0].crossings[i].schedTime;
         countdown = data.d.stops[0].crossings[i].countdown;
@@ -12,12 +13,64 @@ var parseBusTimes = function(data) {
             title: schedTime,
             subtitle: countdown
         });
+    } else items.push({
+        title:'No busses'
+    });
+    return items;
+};
+
+var parseStops = function(data) {
+    var items = [];
+    var name, id;// = data.d.stops[0].crossings[0].countdown;
+    for(var i = 0; i < data.d.length; i++) {
+        name = data.d[i].name;
+        id = data.d[i].id;
+        var index = 0, endIndex;
+        if(name.indexOf('@') > 0)
+           index = name.indexOf('@') + 1;
+        if(name.indexOf(' at') > 0)
+           index = name.indexOf(' at') + 3;
+         if(name.indexOf(' and') > 0)
+           index = name.indexOf(' and') + 4;
+        if(name.indexOf('&') > 0)
+           index = name.indexOf('&') + 1;
+        if(name.indexOf('(Published Stop)') > 0)
+            endIndex = name.indexOf('(Published Stop)');
+        else endIndex = name.length;
+        if(index === 0)
+            index = endIndex;
+        items.push({
+            title: name.substring(0, index),
+            subtitle: name.substring(index, endIndex),
+            id: id
+        });
+    }
+    return items;
+};
+
+var parseDirections= function(data) {
+    var items = [];
+    var direction;
+    for(var i = 0; i < data.d.length; i++) {
+        direction = data.d[i].name;
+        items.push({
+            title: direction,
+            dir: data.d[i].id
+        });
     }
     return items;
 };
 
 var parseRoutes = function(data) {
     var items = [];
+    if(localStorage.getItem('routeNum') > 0)
+        items.push({
+            title: 'Saved',
+            subtitle: localStorage.getItem('routeNum'),
+            routeID: localStorage.getItem('routeID'),
+            directionID: localStorage.getItem('directionID'),
+            stopID: localStorage.getItem('stopID')
+            });
     var number, name;// = data.d.stops[0].crossings[0].countdown;
     for(var i = 0; i < data.d.length; i++) {
         var fullName = data.d[i].name;
@@ -25,7 +78,8 @@ var parseRoutes = function(data) {
         name = fullName.substring(fullName.indexOf('-')+1);
         items.push({
             title: number,
-            subtitle: name
+            subtitle: name,
+            id: data.d[i].id
         });
     }
     return items;
@@ -52,11 +106,7 @@ splashWindow.add(text);
 splashWindow.show();
 
 
-var getBusTimes = function(routeID, directionID, stopID) {
-//var routeNum = 121;
- routeID = 63;
- directionID = 4;
- stopID = 1348;
+var getBusTimes = function(routeNum, routeID, directionID, stopID) {
 var busData = {"routeID": routeID,"directionID":directionID,"stopID":stopID,"useArrivalTimes":true};
 // Make request to lbt
 ajax(
@@ -77,6 +127,10 @@ ajax(
         items: menuItems
     }]
 });
+    localStorage.setItem('routeNum', routeNum);
+    localStorage.setItem('routeID', routeID);
+    localStorage.setItem('directionID', directionID);
+    localStorage.setItem('stopID', stopID);
 
 resultsMenu.show();
 splashWindow.hide();
@@ -87,10 +141,79 @@ splashWindow.hide();
 );
 };
 
+var getStops = function(routeNum, routeID, directionID) {
+// Make request to lbt
+    var busData = {'routeID':routeID,'directionID':directionID};
+ajax(
+  {
+    url:'http://webwatch.lbtransit.com/tmwebwatch/Arrivals.aspx/getStops',
+    method: 'post', 
+    type:'json',
+    data: busData,
+    crossDomain: true
+  },
+  function(data) {
+    console.log('Stringified is: ' + JSON.stringify(data));
+      
+    var menuItems = parseStops(data);
+    var resultsMenu = new UI.Menu({
+    sections: [{
+        title: 'Stops',
+        items: menuItems
+    }]
+    });
+    resultsMenu.on('select', function(e) {
+    console.log('Item number ' + e.item + ' was pressed!');
+    getBusTimes(routeNum, routeID, directionID, e.item.id);
+    });
+
+resultsMenu.show();
+splashWindow.hide();
+  },
+  function(error) {
+    console.log('Download failed: ' + error);
+  }
+);
+};
+
+var getDirections = function(routeNum, routeID) {
+// Make request to lbt
+var busData = {'routeID':routeID};
+ajax(
+  {
+    url:'http://webwatch.lbtransit.com/tmwebwatch/Arrivals.aspx/getDirections',
+    method: 'post', 
+    type:'json',
+    data: busData,
+    crossDomain: true
+  },
+  function(data) {
+    console.log('Stringified is: ' + JSON.stringify(data));
+      
+    var menuItems = parseDirections(data);
+    var resultsMenu = new UI.Menu({
+    sections: [{
+        title: 'Directions',
+        items: menuItems
+    }]
+    });
+    resultsMenu.on('select', function(e) {
+    console.log('Item number ' + e.item + ' was pressed!');
+    getStops(routeNum, routeID, e.item.dir);
+    });
+
+resultsMenu.show();
+splashWindow.hide();
+  },
+  function(error) {
+    console.log('Download failed: ' + error);
+  }
+);
+};
 
 var getRoutes = function() {
 // Make request to lbt
-var busData = {"routeID": 1,"directionID":1,"stopID":1,"useArrivalTimes":true};
+var busData = {};
 ajax(
   {
     url:'http://webwatch.lbtransit.com/tmwebwatch/Arrivals.aspx/getRoutes',
@@ -108,7 +231,14 @@ ajax(
         title: 'Routes',
         items: menuItems
     }]
-});
+    });
+    resultsMenu.on('select', function(e) {
+        console.log('Item number ' + e.item.title + ' was pressed!');
+        if(e.item.title === 'Saved')
+            getBusTimes(e.item.subtitle, e.item.routeID, e.item.directionID, e.item.stopID);
+        else
+        getDirections(e.item.title, e.item.id);
+    });
 
 resultsMenu.show();
 splashWindow.hide();
@@ -120,4 +250,3 @@ splashWindow.hide();
 };
 
 getRoutes();
-//getBusTimes(0,0,0,0);
