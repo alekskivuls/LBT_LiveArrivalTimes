@@ -63,14 +63,6 @@ var parseDirections= function(data) {
 
 var parseRoutes = function(data) {
     var items = [];
-    if(localStorage.getItem('routeNum') > 0)
-        items.push({
-            title: 'Saved',
-            subtitle: localStorage.getItem('routeNum'),
-            routeID: localStorage.getItem('routeID'),
-            directionID: localStorage.getItem('directionID'),
-            stopID: localStorage.getItem('stopID')
-            });
     var number, name;// = data.d.stops[0].crossings[0].countdown;
     for(var i = 0; i < data.d.length; i++) {
         var fullName = data.d[i].name;
@@ -127,10 +119,6 @@ ajax(
         items: menuItems
     }]
 });
-    localStorage.setItem('routeNum', routeNum);
-    localStorage.setItem('routeID', routeID);
-    localStorage.setItem('directionID', directionID);
-    localStorage.setItem('stopID', stopID);
 
 resultsMenu.show();
 splashWindow.hide();

@@ -1,7 +1,7 @@
 {
     "appKeys": {},
     "capabilities": [
-        "location"
+        ""
     ],
     "companyName": "Aleks Kivuls",
     "longName": "LBT_LiveArrivalTimes",
