@@ -4,13 +4,20 @@
         ""
     ],
     "companyName": "Aleks Kivuls",
-    "longName": "LBT_LAT_C",
+    "longName": "LBT Live Arrivals",
     "projectType": "native",
     "resources": {
-        "media": []
+        "media": [
+            {
+                "file": "images/long beach transit.png",
+                "menuIcon": true,
+                "name": "IMAGE_MENU_ICON",
+                "type": "png"
+            }
+        ]
     },
     "sdkVersion": "2",
-    "shortName": "LBT_LAT_C",
+    "shortName": "LBT Live Arrivals",
     "uuid": "06775ae8-4a8a-410b-a1fa-a83c37ad4964",
     "versionCode": 1,
     "versionLabel": "1.0",
