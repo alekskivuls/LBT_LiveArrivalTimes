@@ -4,41 +4,14 @@
         ""
     ],
     "companyName": "Aleks Kivuls",
-    "longName": "LBT_LiveArrivalTimes",
-    "projectType": "pebblejs",
+    "longName": "LBT_LAT_C",
+    "projectType": "native",
     "resources": {
-        "media": [
-            {
-                "file": "images/menu_icon.png",
-                "name": "IMAGE_MENU_ICON",
-                "type": "png"
-            },
-            {
-                "file": "images/logo_splash.png",
-                "name": "IMAGE_LOGO_SPLASH",
-                "type": "png"
-            },
-            {
-                "file": "images/tile_splash.png",
-                "name": "IMAGE_TILE_SPLASH",
-                "type": "png"
-            },
-            {
-                "file": "fonts/UbuntuMono-Regular.ttf",
-                "name": "MONO_FONT_14",
-                "type": "font"
-            },
-            {
-                "file": "images/long beach transit.png",
-                "menuIcon": true,
-                "name": "IMAGES_LONG_BEACH_TRANSIT_PNG",
-                "type": "png"
-            }
-        ]
+        "media": []
     },
-    "sdkVersion": "3",
-    "shortName": "LBT_LiveArrivalTimes",
-    "uuid": "07ab6b61-779c-41fb-b967-700292f8eb45",
+    "sdkVersion": "2",
+    "shortName": "LBT_LAT_C",
+    "uuid": "06775ae8-4a8a-410b-a1fa-a83c37ad4964",
     "versionCode": 1,
     "versionLabel": "1.0",
     "watchapp": {
