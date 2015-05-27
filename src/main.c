@@ -8,6 +8,18 @@ static SimpleMenuLayer *s_simple_menu_layer;
 static SimpleMenuSection s_menu_sections[NUM_MENU_SECTIONS];
 static SimpleMenuItem s_first_menu_items[NUM_FIRST_MENU_ITEMS];
 
+static char *s_buffer;
+
+static void load_resource() {
+  // Get resource and size
+  ResHandle handle = resource_get_handle(RESOURCE_ID_DATA_ROUTES);
+  size_t res_size = resource_size(handle);
+
+  // Copy to buffer
+  s_buffer = (char*)malloc(res_size);
+  resource_load(handle, (uint8_t*)s_buffer, res_size);
+}
+
 static void menu_select_callback(int index, void *ctx) {
   s_first_menu_items[index].subtitle = "Selected";
   layer_mark_dirty(simple_menu_layer_get_layer(s_simple_menu_layer));
@@ -55,6 +67,8 @@ static void init() {
     .unload = main_window_unload,
   });
   window_stack_push(s_main_window, true);
+    
+  load_resource();
 }
 
 static void deinit() {
